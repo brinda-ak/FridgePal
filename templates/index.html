@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Food Waste Reducer</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <style>
+    :root{
+      --bg1:#e8fff3; --bg2:#fff7e8;
+      --ink:#1f4d2b; --muted:#6b7a71; --accent:#2f8f4e;
+      --panel:#ffffff; --ring:#cfe0ea; --chip:#eaf8ef;
+    }
+    body{
+      background: radial-gradient(1200px 600px at 15% 10%, var(--bg1), transparent 60%),
+                  radial-gradient(1200px 700px at 90% 0%, var(--bg2), transparent 55%),
+                  linear-gradient(180deg,#fbfffb,#f7faf9 60%, #f6f7fb);
+    }
+    .hero{ max-width:1100px; margin:auto; padding:56px 18px 16px; }
+    .logo{ font-weight:900; letter-spacing:.2px; color:var(--ink); }
+    .sub{ color:var(--muted) }
+
+    .shell{
+      max-width:1100px; margin:0 auto; padding:22px;
+      border-radius:28px; background:rgba(255,255,255,.65);
+      box-shadow:0 18px 50px rgba(25,60,35,.08), inset 0 1px 0 rgba(255,255,255,.5);
+      border:1px solid rgba(0,0,0,.04); backdrop-filter: blur(10px);
+    }
+
+    .fridge-wrap{
+      position:relative; background:linear-gradient(#f6f9fc,#f1f6fb);
+      border:1px solid var(--ring); border-radius:22px; padding:18px;
+      height:520px; /* fixed; prevents stretching */
+      box-shadow:0 12px 32px rgba(0,0,0,.05); overflow:hidden;
+    }
+    .fridge-svg{ width:100%; max-width:440px; display:block; margin:auto; }
+
+    .fridge-cavity{ position:absolute; inset:92px 30px 86px 30px; }
+    .fridge-cavity::before{
+      content:""; position:absolute; inset:0; pointer-events:none;
+      background:
+        linear-gradient(#d0deea,#d0deea) 0 calc(25% - 2px)/100% 4px no-repeat,
+        linear-gradient(#d0deea,#d0deea) 0 calc(50% - 2px)/100% 4px no-repeat,
+        linear-gradient(#d0deea,#d0deea) 0 calc(75% - 2px)/100% 4px no-repeat;
+      opacity:.95; border-radius:12px;
+    }
+    .food{ position:absolute; font-size:54px; line-height:1; filter:drop-shadow(0 3px 5px rgba(0,0,0,.12)); }
+    .food::after{
+      content:""; position:absolute; bottom:-6px; left:50%; transform:translateX(-50%);
+      width:60%; height:8px; background:rgba(0,0,0,0.18); border-radius:50%; filter:blur(3px); z-index:-1;
+    }
+
+    .i-milk   { top:  6%; left:  5%; transform: rotate(-2deg) translateY(-2px); }
+    .i-egg    { top:  6%; left: 40%; transform: rotate( 3deg); }
+    .i-butter { top:  8%; left: 75%; transform: rotate(-4deg); }
+    .i-lett   { top: 32%; left:  7%; transform: rotate(-6deg) translateY(-2px); }
+    .i-tom    { top: 31%; left: 42%; transform: rotate( 2deg); }
+    .i-car    { top: 32%; left: 78%; transform: rotate( 8deg); }
+    .i-che    { top: 58%; left: 10%; transform: rotate(-3deg); }
+    .i-bread  { top: 57%; left: 42%; transform: rotate( 1deg); }
+    .i-apple  { top: 58%; left: 76%; transform: rotate(-5deg); }
+    .i-soda   { top: 84%; left:  8%; transform: rotate( 4deg); }
+    .i-broc   { top: 82%; left: 42%; transform: rotate(-2deg); }
+    .i-grape  { top: 83%; left: 78%; transform: rotate( 3deg); }
+
+    .panel{ background:var(--panel); border-radius:22px; padding:20px; border:1px solid rgba(0,0,0,.05); box-shadow:0 12px 28px rgba(0,0,0,.06); }
+
+    .drop{ position:relative; border:2px dashed var(--ring); background:#fbfdfd; border-radius:18px; padding:24px; text-align:center; transition:.18s ease; }
+    .drop.drag{ border-color:#7fc69a; background:#f3fff7; }
+    .drop .big{ font-size:44px; }
+    .file-overlay{ position:absolute; inset:0; opacity:0; cursor:pointer; width:100%; height:100%; }
+
+    .preview-card{ display:none; border:1px solid var(--ring); background:#f8fbfa; border-radius:18px; padding:12px; box-shadow:0 8px 20px rgba(0,0,0,.05); }
+    .preview-img{ width:100%; max-height:380px; object-fit:cover; border-radius:12px; border:1px solid #e1ece7; }
+    .preview-actions{ display:flex; gap:8px; margin-top:10px; }
+
+    .chip{display:inline-block;padding:.35rem .6rem;border-radius:999px;background:#eaf8ef;color:#265a34;margin:.2rem .25rem;font-size:.9rem}
+    .btn-success{ background:var(--accent); border-color:var(--accent); }
+    .btn-outline-success{ color:var(--accent); border-color:var(--accent); }
+    .btn-outline-success:hover{ background:var(--accent); color:#fff; }
+    .form-label{ font-weight:700; color:var(--ink); }
+  </style>
+</head>
+<body>
+
+  <header class="hero">
+    <div class="d-flex align-items-center gap-2 mb-2">
+      <span style="font-size:28px">🥕</span>
+      <h1 class="logo mb-0">Food Waste Reducer</h1>
+    </div>
+    <p class="sub mb-4">Turn fridge photos into dinner ideas. Detect what you’ve got, then get recipes you can cook right now.</p>
+  </header>
+
+  <main class="shell">
+    <div class="row g-4 align-items-start">
+      <!-- LEFT: Cute fridge -->
+      <div class="col-lg-5">
+        <div class="fridge-wrap">
+          <svg viewBox="0 0 360 520" class="fridge-svg" aria-hidden="true">
+            <defs>
+              <linearGradient id="doorG" x1="0" y1="0" x2="0" y2="1">
+                <stop stop-color="#ffffff" offset="0"/>
+                <stop stop-color="#f1f6fb" offset="1"/>
+              </linearGradient>
+            </defs>
+            <rect x="20" y="20" rx="28" ry="28" width="320" height="480"
+                  fill="url(#doorG)" stroke="#c9d6e2" stroke-width="3"/>
+            <circle cx="320" cy="80" r="6" fill="#9cc1d6"/>
+            <circle cx="320" cy="420" r="6" fill="#9cc1d6"/>
+            <text x="40" y="80" font-size="26" fill="#2f8f4e" font-weight="900">Fridge</text>
+          </svg>
+
+          <div class="fridge-cavity" aria-hidden="true">
+            <div class="food i-milk">🥛</div><div class="food i-egg">🥚</div><div class="food i-butter">🧈</div>
+            <div class="food i-lett">🥬</div><div class="food i-tom">🍅</div><div class="food i-car">🥕</div>
+            <div class="food i-che">🧀</div><div class="food i-bread">🍞</div><div class="food i-apple">🍎</div>
+            <div class="food i-soda">🥤</div><div class="food i-broc">🥦</div><div class="food i-grape">🍇</div>
+          </div>
+
+          <div class="mt-3">
+            <span class="chip">eco-friendly</span>
+            <span class="chip">AI-powered</span>
+            <span class="chip">zero-waste</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- RIGHT: Upload & Detect -->
+      <div class="col-lg-7">
+        <div class="panel">
+          <h3 class="mb-1" style="color:var(--ink);font-weight:800">Upload & Detect</h3>
+          <p class="sub mb-3">Drop a photo, use your webcam, or pick a sample. Add pantry items and we’ll surface the best recipes.</p>
+
+          <form method="POST" action="/" enctype="multipart/form-data" id="mainForm">
+            <div class="drop w-100 mb-2" id="dropzone">
+              <div class="big mb-1">🖼️</div>
+              <div class="fw-semibold">Drag & drop your fridge photo here</div>
+              <div class="text-muted small">or click to choose a file</div>
+              <input class="file-overlay" type="file" name="file" id="fileInput" accept="image/*">
+            </div>
+
+            <div class="preview-card" id="previewCard">
+              <img id="previewImg" class="preview-img" alt="Selected image preview">
+              <div class="preview-actions">
+                <button class="btn btn-outline-secondary btn-sm" type="button" id="replaceBtn">Replace</button>
+                <button class="btn btn-outline-danger btn-sm" type="button" id="removeBtn">Remove</button>
+              </div>
+            </div>
+
+            <div class="mb-3 mt-3">
+              <label class="form-label">Add items manually (optional)</label>
+              <input type="text" name="manual" class="form-control" placeholder="e.g., eggs, milk, tomato" />
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label">Common pantry items</label>
+              <div class="row row-cols-2 row-cols-md-3 g-2">
+                {% for item in pantry %}
+                  <div class="col">
+                    <div class="form-check">
+                      <input class="form-check-input" type="checkbox" value="{{ item }}" id="p-{{ loop.index }}" name="pantry[]">
+                      <label class="form-check-label" for="p-{{ loop.index }}">{{ item }}</label>
+                    </div>
+                  </div>
+                {% endfor %}
+              </div>
+            </div>
+
+            <button type="submit" class="btn btn-success btn-lg w-100">🔎 Detect & Suggest Recipes</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    const drop = document.getElementById('dropzone');
+    const input = document.getElementById('fileInput');
+    const card = document.getElementById('previewCard');
+    const img  = document.getElementById('previewImg');
+    const replaceBtn = document.getElementById('replaceBtn');
+    const removeBtn  = document.getElementById('removeBtn');
+
+    ['dragenter','dragover'].forEach(evt =>
+      drop.addEventListener(evt, e => { e.preventDefault(); e.stopPropagation(); drop.classList.add('drag'); })
+    );
+    ['dragleave','drop'].forEach(evt =>
+      drop.addEventListener(evt, e => { e.preventDefault(); e.stopPropagation(); drop.classList.remove('drag'); })
+    );
+
+    input.addEventListener('change', () => {
+      const f = input.files && input.files[0];
+      if(!f){ card.style.display='none'; drop.style.display='block'; return; }
+      const reader = new FileReader();
+      reader.onload = ev => { img.src = ev.target.result; card.style.display='block'; drop.style.display='none'; };
+      reader.readAsDataURL(f);
+    });
+
+    replaceBtn.addEventListener('click', () => input.click());
+    removeBtn.addEventListener('click', () => { input.value = ''; card.style.display='none'; drop.style.display='block'; });
+    window.addEventListener('pageshow', () => { input.value=''; card.style.display='none'; drop.style.display='block'; });
+  </script>
+</body>
+</html>

@@ -1,0 +1,31 @@
+{
+  "sample": [
+    "milk",
+    "eggs",
+    "tomato",
+    "lettuce",
+    "cheese"
+  ],
+  "fridge": [
+    "yogurt",
+    "banana",
+    "berries",
+    "butter",
+    "bread"
+  ],
+  "myphoto1.jpg": [
+    "chicken",
+    "broccoli",
+    "garlic",
+    "soy sauce"
+  ],
+  "fridgePicture.jpeg": [
+    "cabbage",
+    "cucumber",
+    "berries",
+    "cheese",
+    "egg",
+    "milk",
+    "pepper"
+  ]
+}

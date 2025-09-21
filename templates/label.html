@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Improve Detection – Food Waste Reducer</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+  <div class="container py-5">
+    <div class="card shadow-lg p-5 rounded-4">
+      <h1 class="text-success mb-3">🛠️ Improve Detection</h1>
+      <p class="text-muted">Pick an image filename and enter the correct ingredients (comma-separated). We’ll save them to the manual dataset.</p>
+
+      <form method="POST">
+        <div class="mb-3">
+          <label class="form-label">Filename</label>
+          <input list="files" name="filename" class="form-control" placeholder="e.g., sample_fridge.jpg" required>
+          <datalist id="files">
+            {% for f in files %}
+              <option value="{{ f }}"></option>
+            {% endfor %}
+          </datalist>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label">Correct Ingredients (comma-separated)</label>
+          <input type="text" name="items" class="form-control" placeholder="e.g., eggs, milk, tomato, lettuce, cheese" required>
+        </div>
+
+        <button type="submit" class="btn btn-success">💾 Save</button>
+        <a href="/" class="btn btn-secondary">⬅ Back</a>
+      </form>
+    </div>
+  </div>
+</body>
+</html>
